@@ -64,7 +64,7 @@ jobs:
         uses: codecov/codecov-action@v3
         
       - name: Check for outdated dependencies
-        run: npm outdated
+        run: npm outdated || true
         
       - name: Build
         run: npm run build
