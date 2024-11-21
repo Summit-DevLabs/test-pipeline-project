@@ -8,6 +8,7 @@ jobs:
   analyze:
     name: Analyze Code
     runs-on: ubuntu-latest
+    
     permissions:
       actions: read
       contents: read
@@ -16,29 +17,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript']
+        language: [ 'javascript' ]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: ${{ matrix.language }}
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-        with:
-          category: "/language:${{matrix.language}}"
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
 
-  build-and-test:
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
+
+  test:
+    name: Run Tests
+    needs: analyze
     runs-on: ubuntu-latest
     
     strategy:
       matrix:
         node-version: [18.x]
-
+    
     steps:
       - uses: actions/checkout@v3
       
@@ -47,7 +53,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          
+      
       - name: Install dependencies
         run: npm ci
         
@@ -69,18 +75,13 @@ jobs:
       - name: Build
         run: npm run build
         
-  e2e-tests:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-      
       - name: Install Playwright
-        run: npx playwright install --with-deps
+        run: |
+          npm install -D @playwright/test
+          npx playwright install --with-deps
         
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: npx playwright test
         
       - name: Upload test results
         if: always()
