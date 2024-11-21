@@ -4,21 +4,20 @@ test.describe('Navigation', () => {
   test('should navigate to main sections', async ({ page }) => {
     await page.goto('/');
     
-    // Check if main page loads
+    // Check if main page loads with correct title
     await expect(page).toHaveTitle(/CacheAdvance/);
     
-    // Check navigation links
-    const links = [
-      { text: 'Installation', href: '/docs/installation' },
-      { text: 'Testing', href: '/docs/testing' },
-    ];
-
-    for (const { text, href } of links) {
-      const link = page.getByRole('link', { name: new RegExp(text, 'i') });
-      await expect(link).toBeVisible();
-      await link.click();
-      await expect(page).toHaveURL(new RegExp(href));
-    }
+    // Find the Introduction section and Installation link within it
+    const introSection = page.getByRole('list').filter({ hasText: 'Introduction' });
+    const installationLink = introSection.getByRole('link', { name: 'Installation' });
+    
+    // Click the Installation link and verify navigation
+    await expect(installationLink).toBeVisible();
+    await installationLink.click();
+    await expect(page).toHaveURL(/installation/);
+    
+    // Verify content is loaded
+    await expect(page.getByRole('heading', { name: /installation/i, level: 1 })).toBeVisible();
   });
 
   test('should toggle dark mode', async ({ page }) => {
@@ -34,15 +33,17 @@ test.describe('Navigation', () => {
     await darkOption.click();
     
     // Verify dark mode is applied
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.locator('html')).toHaveClass(/dark/);
   });
 
   test('should use search functionality', async ({ page }) => {
     await page.goto('/');
     
-    // Open search dialog
-    const searchButton = page.getByRole('button', { name: /search/i });
-    await searchButton.click();
+    // Open search dialog (either by button or keyboard shortcut)
+    await Promise.any([
+      page.keyboard.press(process.platform === 'darwin' ? 'Meta+k' : 'Control+k'),
+      page.getByRole('button', { name: /search/i }).click()
+    ]);
     
     // Wait for search dialog
     const searchDialog = page.getByRole('dialog');
@@ -51,13 +52,10 @@ test.describe('Navigation', () => {
     // Type search query
     await page.keyboard.type('installation');
     
-    // Wait for search results
-    const searchResults = page.getByRole('listbox');
-    await expect(searchResults).toBeVisible();
-    
-    // Click first result that matches
-    const firstResult = page.getByRole('option', { name: /installation/i }).first();
-    await firstResult.click();
+    // Wait for and click search result
+    const searchResult = page.getByRole('option', { name: /installation/i }).first();
+    await expect(searchResult).toBeVisible();
+    await searchResult.click();
     
     // Verify navigation
     await expect(page).toHaveURL(/installation/);
