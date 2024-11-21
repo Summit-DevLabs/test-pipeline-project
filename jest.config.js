@@ -8,7 +8,8 @@ module.exports = {
   testPathIgnorePatterns: [
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
-    '<rootDir>/e2e/'
+    '<rootDir>/e2e/',
+    '<rootDir>/__tests__/utils/'
   ],
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],

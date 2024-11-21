@@ -1,4 +1,4 @@
-import { isDefined, wait } from '../utils/testUtils';
+import { isDefined, wait } from '../../src/utils/testUtils';
 
 describe('Utility Function Testing Examples', () => {
   describe('Type Checking', () => {
