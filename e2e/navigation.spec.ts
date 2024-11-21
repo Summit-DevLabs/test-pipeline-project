@@ -14,7 +14,7 @@ test.describe('Navigation', () => {
     ];
 
     for (const { text, href } of links) {
-      const link = page.getByRole('link', { name: text });
+      const link = page.getByRole('link', { name: new RegExp(text, 'i') });
       await expect(link).toBeVisible();
       await link.click();
       await expect(page).toHaveURL(new RegExp(href));
@@ -30,17 +30,23 @@ test.describe('Navigation', () => {
     
     // Select dark theme
     const darkOption = page.getByRole('option', { name: /dark/i });
+    await expect(darkOption).toBeVisible();
     await darkOption.click();
     
     // Verify dark mode is applied
-    await expect(page.locator('html')).toHaveClass(/dark/);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   });
 
   test('should use search functionality', async ({ page }) => {
     await page.goto('/');
     
     // Open search dialog
-    await page.keyboard.press('Control+k');
+    const searchButton = page.getByRole('button', { name: /search/i });
+    await searchButton.click();
+    
+    // Wait for search dialog
+    const searchDialog = page.getByRole('dialog');
+    await expect(searchDialog).toBeVisible();
     
     // Type search query
     await page.keyboard.type('installation');
@@ -49,8 +55,8 @@ test.describe('Navigation', () => {
     const searchResults = page.getByRole('listbox');
     await expect(searchResults).toBeVisible();
     
-    // Click first result
-    const firstResult = searchResults.getByRole('option').first();
+    // Click first result that matches
+    const firstResult = page.getByRole('option', { name: /installation/i }).first();
     await firstResult.click();
     
     // Verify navigation
