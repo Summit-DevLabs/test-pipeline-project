@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest"
+    "test": "jest",
+    "test:e2e": "playwright test"
   },
   "browserslist": "defaults, not ie <= 11",
   "dependencies": {
@@ -37,6 +38,7 @@
     "typescript": "^5.6.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
     "babel-jest": "^29.7.0",
