@@ -15,11 +15,19 @@ jobs:
   wait-for-ci:
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for CI workflow
+      - name: Wait for Code Analysis
         uses: lewagon/wait-on-check-action@v1.3.1
         with:
           ref: ${{ github.ref }}
-          check-name: 'Run Tests'
+          check-name: 'Code Analysis'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
+          
+      - name: Wait for Test Suite
+        uses: lewagon/wait-on-check-action@v1.3.1
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'Test Suite'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
 

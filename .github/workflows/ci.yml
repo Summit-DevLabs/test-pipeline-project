@@ -3,10 +3,12 @@ name: Continuous Integration
 on:
   push:
     branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
 
 jobs:
   analyze:
-    name: Analyze Code
+    name: Code Analysis
     runs-on: ubuntu-latest
     
     permissions:
@@ -37,7 +39,7 @@ jobs:
         category: "/language:${{matrix.language}}"
 
   test:
-    name: Run Tests
+    name: Test Suite
     needs: analyze
     runs-on: ubuntu-latest
     
