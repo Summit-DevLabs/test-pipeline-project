@@ -27,8 +27,7 @@ jobs:
         uses: lewagon/wait-on-check-action@v1.3.1
         with:
           ref: ${{ github.ref }}
-          running-workflow-name: 'Development Deployment'
-          check-name: 'Test Suite'
+          check-name: 'Test Suite (18.x)'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
 
