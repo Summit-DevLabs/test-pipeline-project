@@ -8,7 +8,7 @@ on:
 
 jobs:
   analyze:
-    name: Code Analysis
+    name: Code Analysis (${{ matrix.language }})
     runs-on: ubuntu-latest
     
     permissions:
@@ -39,7 +39,7 @@ jobs:
         category: "/language:${{matrix.language}}"
 
   test:
-    name: Test Suite
+    name: Test Suite (${{ matrix.node-version }})
     needs: analyze
     runs-on: ubuntu-latest
     
