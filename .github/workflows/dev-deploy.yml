@@ -10,6 +10,11 @@ on:
     branches:
       - 'develop'
 
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 jobs:
   wait-for-ci:
     runs-on: ubuntu-latest
