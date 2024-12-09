@@ -5,7 +5,6 @@ name: Development Deployment
 on:
   push:
     branches:
-      - 'feature/**'
       - 'develop'
   pull_request:
     branches:
