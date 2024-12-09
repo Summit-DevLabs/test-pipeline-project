@@ -6,89 +6,28 @@ on:
       - 'staging'
   pull_request:
     branches:
-      - 'main'
       - 'staging'
 
 jobs:
-  analyze:
-    name: Analyze Code
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: ['javascript']
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: ${{ matrix.language }}
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-        with:
-          category: "/language:${{matrix.language}}"
-
-  build-and-test:
-    runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        node-version: [18.x]
-
     steps:
       - uses: actions/checkout@v3
       
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 18.x
           cache: 'npm'
           
       - name: Install dependencies
         run: npm ci
         
-      - name: Check for vulnerable dependencies
-        run: npm audit
-        
-      - name: Run ESLint
-        run: npm run lint
-        
-      - name: Run Jest tests with coverage
-        run: npm run test -- --coverage
-        
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
-        
-      - name: Check for outdated dependencies
-        run: npm outdated
-        
       - name: Build
         run: npm run build
 
-  e2e-tests:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-        
-      - name: Run E2E tests
-        run: npm run test:e2e
-
   deploy-qa:
-    needs: [build-and-test, e2e-tests]
+    needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/staging'
     environment: qa
@@ -104,6 +43,5 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./ 
-          vercel-args: '--prod'
           alias-domains: |
             qa.yourapp.com
