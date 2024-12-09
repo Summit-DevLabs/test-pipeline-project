@@ -64,7 +64,7 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./
-          vercel-args: '--name dev-test-pipeline-project'
+          vercel-args: '--scope dev'
           alias-domains: |
             pr-{{PR_NUMBER}}.preview.yourapp.com
 
@@ -85,6 +85,6 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./
-          vercel-args: '--name dev-test-pipeline-project'
+          vercel-args: '--scope dev'
           alias-domains: |
             dev.yourapp.com
