@@ -3,10 +3,10 @@ name: QA Deployment
 on:
   push:
     branches:
-      - 'staging'
+      - 'stage-qa'
   pull_request:
     branches:
-      - 'staging'
+      - 'stage-qa'
 
 permissions:
   contents: read
