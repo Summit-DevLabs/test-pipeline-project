@@ -3,10 +3,10 @@ name: QA Deployment
 on:
   push:
     branches:
-      - 'stage-qa'
+      - 'stage-qa'  # This will trigger on push to stage-qa
   pull_request:
     branches:
-      - 'stage-qa'
+      - 'stage-qa'  # Uncomment if you want to run checks on PRs
 
 permissions:
   contents: read
@@ -34,7 +34,7 @@ jobs:
   deploy-qa:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/staging'
+    if: github.ref == 'refs/heads/stage-qa'  # Change to match the branch
     environment: qa
     
     steps:
