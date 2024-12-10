@@ -1,0 +1,94 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  analyze:
+    name: Code Analysis (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
+
+  test:
+    name: Test Suite (${{ matrix.node-version }})
+    needs: analyze
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x]
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Check for vulnerable dependencies
+        run: npm audit
+        
+      - name: Run ESLint
+        run: npm run lint
+        
+      - name: Run Jest tests with coverage
+        run: npm run test -- --coverage
+        
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        
+      - name: Check for outdated dependencies
+        run: npm outdated || true
+        
+      - name: Build
+        run: npm run build
+        
+      - name: Install Playwright
+        run: |
+          npm install -D @playwright/test
+          npx playwright install --with-deps
+        
+      - name: Run E2E tests
+        run: npx playwright test
+        
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

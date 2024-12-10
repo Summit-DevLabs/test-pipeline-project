@@ -1,0 +1,13 @@
+{
+  "git": {
+    "deploymentEnabled": {
+      "main": false,
+      "develop": false,
+      "feature/**": false
+    }
+  },
+  "github": {
+    "enabled": false,
+    "silent": true
+  }
+}
