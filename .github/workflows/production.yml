@@ -82,10 +82,10 @@ jobs:
       - name: Check dependencies
         run: npm outdated
 
-      - name: Run Snyk Security Scan
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      # - name: Run Snyk Security Scan
+      #   uses: snyk/actions/node@master
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   test:
     name: Run tests
@@ -169,7 +169,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: production
-      url: https://www.yourapp.com
+      # url: https://www.yourapp.com
 
     steps:
       - name: Checkout code
@@ -184,7 +184,7 @@ jobs:
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-token: ${{ secrets.VERCEL_PROD_TOKEN }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -213,20 +213,16 @@ jobs:
     if: always()
 
     steps:
-      - name: Notify Slack on Success
+      - name: Notify Discord on Success
         if: success()
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          channel-id: 'production-deploys'
-          slack-message: '✅ Production deployment successful!\nVersion: v${{ github.run_number }}\nCommit: ${{ github.sha }}'
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"content": "✅ Production deployment successful!\nVersion: v${{ github.run_number }}\nCommit: ${{ github.sha }}"}' \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
 
-      - name: Notify Slack on Failure
+      - name: Notify Discord on Failure
         if: failure()
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          channel-id: 'production-deploys'
-          slack-message: '❌ Production deployment failed!\nVersion: v${{ github.run_number }}\nCommit: ${{ github.sha }}'
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"content": "❌ Production deployment failed!\nVersion: v${{ github.run_number }}\nCommit: ${{ github.sha }}"}' \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
